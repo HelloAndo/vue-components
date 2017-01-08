@@ -3,87 +3,95 @@
 	<input type="text" readonly autocomplete="off" 
 					v-model="cascader"
 					@click.stop="showDropdown">
+	<span class="remove"
+				v-show="choice.length"
+				@click="removeChoice">&#10006;</span>
 	<transition	name="demo">
 	<div class="dropdown"
 				v-show="isShowCascader">
 		<tree :tree-data="treeData"
-					@get-choice="getChoice"
-					:choice="defaultChoice"></tree>
+					@get-choice="getChoice"></tree>
 	</div>
 	</transition>
 </div>
 </template>
 <script>
-import $ from 'jQuery'
+import $ from 'jquery'
 import tree from './tree.vue'
+var flag = false;
 export default {
 	props: {
 		treeData: {
 			type: Array
+		},
+		defaultChoice: {
+			type: Array,
+			default: function () {
+				return [];
+			}
 		}
 	},
 	data () {
 		return {
-			choice: ['台湾', '垦丁', '美女'],
-			// choice: ['台湾', '台北', '中山区', '蚵仔煎'],
+			choice: this.defaultChoice,
 			count: 0,
-			flag: false,
-			defaultChoice: [],
-			isShowCascader: true
+			// flag: false,
+			isShowCascader: false
 		}
 	},
 	methods: {
 		getChoice (val) {
-			// console.log(val);
-			this.flag = true;
+			flag = true;
 			this.getActive(this.treeData, val);
 		},
 		getActive (data, val) {
-			if (this.flag === true) {
+			if (flag) {
 				this.choice = [];
-				this.flag = false;
+				flag = false;
 			}
 			var res = data.find(function (el) {
 				return el.active;
 			});
 			this.choice.push(res.parent);
-			// console.log()
-			res.parent !== val && this.getActive(res.children, val);
-			// if (res.parent !== val) {
-			// 	this.getActive(res.children, val);
-			// }
+
+			res.parent !== val ? this.getActive(res.children, val) : this.$emit('get-result', this.choice);
+
 		},
 		showDropdown () {
 			this.isShowCascader = true;
 		},
 		addKey (data) {
 			var self = this;
-			// self.count++;
-			// debugger
 			data.forEach(function (el, i) {
-				var bool = el.parent === self.defaultChoice[self.count] ? true : false; 
+				var bool = el.parent === self.choice[self.count] ? true : false; 
 				el = Object.assign({}, el, {'active': bool});
 				data.splice(i, 1, el);
-				if (el.children) {
-					// if (bool) {
-					// 	self.count++;
-					// }
-					self.addKey(el.children);
-					bool && self.count++;
-				}
+				// if (el.children) {
+				bool && self.count++;
+				el.children && el.children.length && self.addKey(el.children);
+				// }
 			});
 
+		},
+		removeChoice () {
+			this.choice = [];
+			this.resetList(this.treeData);
+			this.$emit('get-result', []);
+		},
+		resetList (data) {
+			var self = this;
+			data.forEach(function (el) {
+				el.active = false;
+				el.children && el.children.length && self.resetList(el.children);
+			});
 		}
 	},
 	mounted () {
 		var self = this;
-		if (self.choice.length) {
-			// self.isShowCascader = true;
-			for (let i = 0, len = self.choice.length; i < len; i++) {
-				self.defaultChoice[i] = self.choice[i];
-			}
-			self.addKey(self.treeData);
-		}
+
+		// self.choice.length &&	
+		self.addKey(self.treeData);
+
 		$('html, body').click(function(e) {
 			self.isShowCascader = false;
 		});
@@ -93,20 +101,21 @@ export default {
 			get: function () {
 				return this.choice.join('/');
 			}
-		},
-		// defaultChoice: {
-		// 	get: function () {
-		// 		return this.choice.reverse();
-		// 	}
-		// }
+		}
 	},
 	components: {
 		tree
 	}
 }
 </script>
-<style>
-.dy-cascader{position: relative; width: 130px;}
+<style scoped>
+.dy-cascader{position: relative; width: 100%;}
+.remove{/* display: none; */ position: absolute;right: 7px; top: 7px; font-size: 12px; background-color: #e7e7e7; color: #7e7e7e; padding: 3px 6px;  border-radius: 50%; cursor: pointer;
+	visibility: hidden;
+	opacity: 0;
+	transition: all .5s cubic-bezier(0.28, -0.04, 0.42, 1.5);
+}
+.dy-cascader:hover .remove{ visibility: visible; opacity: 1;}
 .demo-enter-active, .demo-leave-active {
   transition: all .4s ease;
   transform: translateY(0);

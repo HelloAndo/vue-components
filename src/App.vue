@@ -1,35 +1,56 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <!-- <img src="./assets/logo.png"> -->
     <!-- <hello></hello> -->
-    <auto-complete :options="options"
+    <div id="cascader">
+      <!--<dy-cascader :tree-data="treeData"
+                   @get-result="outputCascaderResult"></dy-cascader>  -->
+      <dy-cascader :tree-data="treeData"
+                   :default-choice="defaultChoice"
+                   @get-result="outputCascaderResult"></dy-cascader>  
+      <p>级联选择器,可指定默认值</p>    
+    </div>
+    <div id="tags-select">
+      <tags-select :options="options"
                     @get-options="getOptions"
-                    @hit="getChoice"></auto-complete>
-
-    <!-- <div> -->
-    <dy-cascader :tree-data="treeData"></dy-cascader>      
-    <!-- </div> -->
-
+                    @get-result="outputTagsSelectResutl"></tags-select>  
+      <p>select2多选,可随意输入的内容</p>        
+    </div>
+    <div id="auto-complete">
+      <auto-complete :options="list"
+                      @get-options="getList"
+                      @hit="outputAutoCompleteResult"></auto-complete>
+      <p>自动完成/联想输入</p>        
+    </div>
   </div>
 </template>
 
 <script>
 // import $ from 'jQuery'
-import Hello from './components/Hello'
-import autoComplete from './components/autoComplete'
+// import Hello from './components/Hello'
+import tagsSelect from './components/tags-select'
 import dyCascader from './components/dy-cascader'
+import autoComplete from './components/auto-complete'
 var ando = 'ando'
 export default {
   name: 'app',
   components: {
-    Hello,
-    autoComplete,
-    dyCascader
+    tagsSelect,
+    dyCascader,
+    autoComplete
   },
   data () {
     return {
-      options: [],
-      dataList: ['abc', 'cba', 'aaa', 'absent', 'banana', 'apple', 'ball', 'Canada', 'chinese', 'love', 'America'],   
+      /*模拟select2和autoComplete的后台数据*/
+      dataList: ['abc', 'cba', 'aaa', 'absent', 'banana', 'apple', 'ball', 'Canada', 'chinese', 'love', 'America'],
+      /*tags-select数据*/
+      options: ['abc', 'cba', 'aaa', 'absent', 'banana', 'apple', 'ball', 'Canada', 'chinese', 'love', 'America'], 
+      /*auto-complete数据  */
+      list: [],
+      /*级联选择器cascader数据*/
+			defaultChoice: ['台湾', '垦丁', '美女'],
+			// defaultChoice: [],
+
       treeData: [{
         parent: '广东',
         children: [{
@@ -92,19 +113,40 @@ export default {
   },
   methods: {
     getOptions (val) {
-      if (!val) {
-        this.options = [];
-        return;
-      }
+      // if (!val) {
+      //   this.options = [];
+      //   return;
+      // }
+      // console.log(val)
       this.options = this.dataList.filter(function (el) {
         return el.indexOf(val) > -1;
       });
-      if (!this.options.length) {
-        this.options = ['无搜索结果'];
-      }
+      // if (!this.options.length) {
+      //   this.options = ['无搜索结果'];
+      // }
     },
-    getChoice (val) {
-      console.log(val);
+    getList (val) {
+      var self = this;
+      // this.list = this.dataList.filter(function (el) {
+      //   return el.indexOf(val) > -1;
+      // });
+      self.list = [];
+      setTimeout(function () {
+        for (let i=0; i<self.dataList.length; i++) {
+          if (self.dataList[i].indexOf(val) > -1) {
+            self.list.push(self.dataList[i]);
+          }
+        }
+      }, 400);
+    },
+    outputAutoCompleteResult (val) {
+      console.log('autoComplete组件结果: ', val);
+    },
+    outputCascaderResult (val) {
+      console.log('cascader组件结果: ', val);
+    },
+    outputTagsSelectResutl (val) {
+      console.log('tagsSelect组件结果: ', val);
     }
   },
 }
@@ -117,8 +159,33 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 10px;
 }
 *{margin: 0; padding: 0; box-sizing: border-box;}
 ul, li{list-style-type: none; text-align: left;}
+
+#cascader{position: relative; width: 400px; height: 200px; padding: 20px; margin: 0 auto 20px; border: 1px solid #ececec; border-radius: 2px;
+  -webkit-transition: box-shadow .6s ease;
+  -o-transition: box-shadow .6s ease;
+  transition: box-shadow .6s ease;
+}
+#cascader:hover{box-shadow: 2px 2px 8px rgba(0,0,0,.2);}
+#cascader p{position: absolute;left: 0; bottom: 0; right: 0; background-color: #f5f5f5; line-height: 3; border-top: 1px solid #f5f5f5;}
+
+#auto-complete{position: relative; width: 400px; height: 200px; padding: 20px; margin: 0 auto 20px; border: 1px solid #ececec; border-radius: 2px;
+  -webkit-transition: box-shadow .6s ease;
+  -o-transition: box-shadow .6s ease;
+  transition: box-shadow .6s ease;
+}
+#auto-complete:hover{box-shadow: 2px 2px 8px rgba(0,0,0,.2);}
+#auto-complete p{position: absolute;left: 0; bottom: 0; right: 0; background-color: #f5f5f5; line-height: 3; border-top: 1px solid #f5f5f5;}
+
+
+#tags-select{position: relative; width: 400px; height: 200px; padding: 20px; margin: 0 auto 20px; border: 1px solid #ececec; border-radius: 2px;
+  -webkit-transition: box-shadow .6s ease;
+  -o-transition: box-shadow .6s ease;
+  transition: box-shadow .6s ease;}
+#tags-select:hover{box-shadow: 2px 2px 8px rgba(0,0,0,.2);}
+#tags-select p{position: absolute;left: 0; bottom: 0; right: 0; background-color: #f5f5f5; line-height: 3; border-top: 1px solid #f5f5f5;}
+
 </style>
