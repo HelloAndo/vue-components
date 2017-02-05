@@ -18,6 +18,7 @@
 		</ul>
 	</transition>
 </div>
+<!--<p>我是autoComplete</p>-->
 </template>
 <script>
 export default {

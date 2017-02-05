@@ -1,10 +1,19 @@
 <template>
   <div id="app">
+    <!--<router-link :to="{path: '/cascader'}">级联选择器</router-link>
+    <router-link :to="{path: '/tagsSelect'}">select2多选</router-link>
+    <router-link :to="{path: '/autoComplete'}">select2多选</router-link>-->
+    <div id="sortable-list">
+      <sortable-list :sortable-data="sortableData"
+                      @sort="sort"
+                      @clear="clear"></sortable-list>
+    </div>
+    <p>
+      <div class="demo" draggable>三三</div>  
+    </p>
     <!-- <img src="./assets/logo.png"> -->
     <!-- <hello></hello> -->
-    <div id="cascader">
-      <!--<dy-cascader :tree-data="treeData"
-                   @get-result="outputCascaderResult"></dy-cascader>  -->
+    <!--<div id="cascader">
       <dy-cascader :tree-data="treeData"
                    :default-choice="defaultChoice"
                    @get-result="outputCascaderResult"></dy-cascader>  
@@ -21,7 +30,11 @@
                       @get-options="getList"
                       @hit="outputAutoCompleteResult"></auto-complete>
       <p>自动完成/联想输入</p>        
-    </div>
+    </div>-->
+    <!--<div id="tags-select">
+      <router-view></router-view>
+    </div>-->
+
   </div>
 </template>
 
@@ -31,16 +44,56 @@
 import tagsSelect from './components/tags-select'
 import dyCascader from './components/dy-cascader'
 import autoComplete from './components/auto-complete'
+import sortableList from './components/sortable-list'
 var ando = 'ando'
 export default {
   name: 'app',
   components: {
     tagsSelect,
     dyCascader,
-    autoComplete
+    autoComplete,
+    sortableList
+  },
+  watch: {
+    '$route': {
+      handler: function () { 
+        console.log('--------')
+       }
+    }
+  },
+  // route: {
+  //   canReuse: false
+  // },
+  mounted () {
+    this.addKey(this.sortableData);
+    // debugger
   },
   data () {
     return {
+      // 可拖拽排序列表数据
+      sortableData: [{
+        name: '0'
+      }, {
+        name: '1',
+        children: [{
+          name: '1-0',
+          children: [{
+            name: '1-0-0',
+            children: [{
+              name: '1-0-0-0'
+            }, {
+              name: '1-0-0-1'
+            }]
+          }, {
+            name: '1-0-1'
+          }]
+        }]
+      }, {
+          name: '2',
+          children: [{
+            name: '2-0'
+          }]
+        }],
       /*模拟select2和autoComplete的后台数据*/
       dataList: ['abc', 'cba', 'aaa', 'absent', 'banana', 'apple', 'ball', 'Canada', 'chinese', 'love', 'America'],
       /*tags-select数据*/
@@ -112,6 +165,89 @@ export default {
     }
   },
   methods: {
+    addKey (data) {
+      data.forEach((obj, i) => {
+        obj = Object.assign({}, obj, {
+          dropType: {
+            'drop-coincide': false,
+            'drop-up': false,
+            'drop-down': false
+          }
+        });
+        data.splice(i, 1, obj);
+        obj.children 
+        && obj.children.length 
+        && this.addKey(obj.children);
+      });
+    },
+    sort (dragNode, dropNode) {
+      // debugger
+      this.handleDragNode(this.sortableData, dragNode, dropNode);
+      this.handleDropNode(this.sortableData, dragNode, dropNode);
+      console.log(this.sortableData)
+      // debugger
+    },
+    clear () {
+      this.resetStyle(this.sortableData);
+    },
+    resetStyle (data) {
+      data.forEach((node, index) => {
+        node = Object.assign({}, node, {
+          dropType: {
+            'drop-coincide': false,
+            'drop-up': false,
+            'drop-down': false
+          }
+        });
+        data.splice(index, 1, node);
+        node.children && node.children.length
+        && this.resetStyle(node.children);
+      });
+    },
+    handleDragNode (data, dragNode, dropNode) {
+      var self = this;
+      var dragIndex = data.findIndex((el) => 
+        dragNode.name === el.name);
+      // debugger
+      if (dragIndex > -1) {
+        data.splice(dragIndex, 1);
+      } else {
+        data.length && data.forEach((el) => {
+          el.children && this.handleDragNode(el.children, dragNode, dropNode);
+        });
+      }
+    },
+    handleDropNode (data, dragNode, dropNode) {
+      var dropIndex = data.findIndex((el) => dropNode.name === el.name);
+// debugger
+      if (dropIndex > -1) {
+        // debugger
+        if (dropNode.dropType['drop-coincide']) {
+          // 进入
+          data[dropIndex].children
+          ? data[dropIndex].children.push(dragNode)
+          : data.splice(dropIndex, 1, Object.assign({}, data[dropIndex], {children: [dragNode]}));
+        } else if (dropNode.dropType['drop-up']) {
+          // 排前
+          // dropIndex === 0
+          // ? data.unshift(dragNode)
+          // : 
+          data.splice(dropIndex, 0, dragNode);
+          // debugger
+        } else if (dropNode.dropType['drop-down']) {
+          //排后
+          // dropIndex === data.length - 1
+          // ? data.push(dragNode)
+          // : 
+          data.splice(dropIndex + 1, 0, dragNode);
+        }
+
+      } else {
+        data.length && data.forEach((el) => {
+          el.children && this.handleDropNode(el.children, dragNode, dropNode);
+        });
+      }
+    },
     getOptions (val) {
       // if (!val) {
       //   this.options = [];
@@ -187,5 +323,7 @@ ul, li{list-style-type: none; text-align: left;}
   transition: box-shadow .6s ease;}
 #tags-select:hover{box-shadow: 2px 2px 8px rgba(0,0,0,.2);}
 #tags-select p{position: absolute;left: 0; bottom: 0; right: 0; background-color: #f5f5f5; line-height: 3; border-top: 1px solid #f5f5f5;}
+
+.demo{display: inline-block; background-color: yellow; cursor: default;}
 
 </style>

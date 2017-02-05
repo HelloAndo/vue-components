@@ -14,6 +14,7 @@
 	</div>
 	</transition>
 </div>
+<!--<p>我是dyCascader</p>-->
 </template>
 <script>
 import $ from 'jquery'
@@ -86,16 +87,15 @@ export default {
 			});
 		}
 	},
-	mounted () {
-		var self = this;
+	// mounted () {
+	// 	var self = this;
 
-		// self.choice.length &&	
-		self.addKey(self.treeData);
+	// 	self.addKey(self.treeData);
 
-		$('html, body').click(function(e) {
-			self.isShowCascader = false;
-		});
-	},
+	// 	$('html, body').click(function(e) {
+	// 		self.isShowCascader = false;
+	// 	});
+	// },
 	computed: {
 		cascader: {
 			get: function () {

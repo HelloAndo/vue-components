@@ -17,3 +17,6 @@ input:focus {
   border: 1px solid #41cac0;
   outline: 0;
 }
+
+.sortable-ul{padding-left: 15px;}
+.sortable-ul li{}

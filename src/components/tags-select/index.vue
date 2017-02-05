@@ -40,9 +40,6 @@
 								:style="{width: iptWidth}">		
 			</span>
 		</div>
-<!-- 		<input type="text" class="ipt"
-						v-model="myinput"
-						:style="{width: iptWidth}">		 -->
 	</div>
 	<transition	name="demo">
 		<ul class="searchRes"
@@ -55,6 +52,7 @@
 		</ul>
 	</transition>
 </div>
+<!--<p>我是tagsSelect</p>-->
 </template>
 <script>
 import $ from 'jquery'
@@ -194,16 +192,16 @@ export default {
 	    return width;
     }
 	},
-	mounted () {
-		var self = this;
-		fontSetting = $(self.$el).find('.ipt').css('font');
-		console.log(fontSetting);
-		document.addEventListener("click", function(){
-		  self.isShowOptions = false;
-		  self.isInputBreak = false;
-		  self.myinput = '';
-		});
-	}
+	// mounted () {
+	// 	var self = this;
+	// 	fontSetting = $(self.$el).find('.ipt').css('font');
+	// 	console.log(fontSetting);
+	// 	document.addEventListener("click", function(){
+	// 	  self.isShowOptions = false;
+	// 	  self.isInputBreak = false;
+	// 	  self.myinput = '';
+	// 	});
+	// }
 }
 </script>
 
