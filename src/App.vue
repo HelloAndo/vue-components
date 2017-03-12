@@ -11,6 +11,9 @@
     <p>
       <div class="demo" draggable>三三</div>  
     </p>
+    <div>
+      <date-picker></date-picker>
+    </div>
     <!-- <img src="./assets/logo.png"> -->
     <!-- <hello></hello> -->
     <!--<div id="cascader">
@@ -45,6 +48,8 @@ import tagsSelect from './components/tags-select'
 import dyCascader from './components/dy-cascader'
 import autoComplete from './components/auto-complete'
 import sortableList from './components/sortable-list'
+import datePicker from './components/date-picker/index'
+
 var ando = 'ando'
 export default {
   name: 'app',
@@ -52,7 +57,8 @@ export default {
     tagsSelect,
     dyCascader,
     autoComplete,
-    sortableList
+    sortableList,
+    datePicker
   },
   watch: {
     '$route': {

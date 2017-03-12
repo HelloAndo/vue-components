@@ -1,3 +1,5 @@
+.fl{float: left;}
+.fr{float: right;}
 input{
   display: block;
   width: 100%;

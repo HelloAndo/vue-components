@@ -19,21 +19,20 @@
 </template>
 <script>
 import $ from 'jquery'
+// 递归文件全局变量可以共享？
 let dragNode = null;
+let dragEl = null;
 let isChild = false;
 export default {
   name: 'sortable-list',
   props: ['sortableData'],
   data () {
     return {
-      dx: 0,
-      dy: 0,
-      dropH: 0,
-      dragH: 0
+      dropH: 0
     }
   },
   mounted () {
-    // console.log(this.$parent)
+    
   },
   methods: {
     sort (dragNode, dropNode) {
@@ -53,15 +52,17 @@ export default {
       this.sortableData.splice(index, 1, node);
     },
     dragstart (e, node) {
-      this.dx = e.clientX - $(e.currentTarget).offset().left;
-      this.dy = e.clientY - $(e.currentTarget).offset().top;
-      this.dragH = $(e.currentTarget).outerHeight();
+      // 保存当前node对象
       dragNode = node;
+      // 保存当前实例
+      dragEl = this;
     },
     dragend (e) {
 
     },
     dragenter (e, node, index) {
+      // console.log(dragNode.name)
+      // console.log(node.name)
       this.dropH = $(e.currentTarget).outerHeight();
     },
     dragleave (e, node, index) {
@@ -69,10 +70,10 @@ export default {
       let top = e.clientY - $(e.currentTarget).offset().top;
     },
     dragover (e, node, index) {
-      console.log(this)
-      debugger
       this.$emit('clear');
       if (node.name === dragNode.name) return;
+      // console.log(dragNode)
+      // debugger
       let top = e.clientY - $(e.currentTarget).offset().top;
       if (top < 1/4 * this.dropH) {
         this.changeDropEleStyle(node, index, [true, false, false]);
